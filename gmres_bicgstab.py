@@ -27,26 +27,26 @@ for j in range(1, N + 1):
         x = i * h
         y = j * h
 
-         u_exact[k] = np.sin(np.pi * x) * np.sin(np.pi * y)
+        u_exact[k] = np.sin(np.pi * x) * np.sin(np.pi * y)
 
-         b[k] = (
+        b[k] = (
             2 * epsi * np.pi**2 * np.sin(np.pi*x) * np.sin(np.pi*y)
             + np.pi * beta1 * np.cos(np.pi*x) * np.sin(np.pi*y)
             + np.pi * beta2 * np.sin(np.pi*x) * np.cos(np.pi*y)
         )
 
-         A[k, k] = 4 * epsi / h**2
+        A[k, k] = 4 * epsi / h**2
 
-         if i < N:
+        if i < N:
             A[k, k + 1] = -epsi / h**2 + beta1 / (2 * h)
 
-         if i > 1:
+        if i > 1:
             A[k, k - 1] = -epsi / h**2 - beta1 / (2 * h)
 
-         if j < N:
+        if j < N:
             A[k, k + N] = -epsi / h**2 + beta2 / (2 * h)
 
-         if j > 1:
+        if j > 1:
             A[k, k - N] = -epsi / h**2 - beta2 / (2 * h)
 
  
