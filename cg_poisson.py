@@ -3,10 +3,7 @@ import scipy.sparse as sp
 import time
 from scipy.sparse.linalg import LinearOperator, spsolve_triangular
 import matplotlib.pyplot as plt
-
-# ==============================================================
-# Matrix and RHS
-# ==============================================================
+ 
 N = 40
 h = 1 / (N + 1)
 n = N * N
@@ -27,10 +24,7 @@ b_norm = np.linalg.norm(b)
 
 print("Matrix size:", A.shape, "| nnz:", A.nnz)
 
-
-# ==============================================================
-# Manual CG — guarantees per-iteration residual recording
-# ==============================================================
+ 
 def cg_manual(A, b, M=None, tol=1e-8, maxiter=None):
     """
     Conjugate Gradient with optional preconditioner M (LinearOperator or sparse).
@@ -84,10 +78,7 @@ def cg_manual(A, b, M=None, tol=1e-8, maxiter=None):
 
     return x, info, len(res_hist), res_hist
 
-
-# ==============================================================
-# Run all methods
-# ==============================================================
+ 
 results = []
 histories = {}
 
@@ -112,16 +103,16 @@ def run(name, M, setup_time):
     histories[name] = hist
 
 
-# 1) Plain CG
+ 
 run("no preconditioning", M=None, setup_time=0.0)
 
-# 2) Jacobi
+ 
 t0 = time.perf_counter()
 M_jacobi = sp.diags(1.0 / A.diagonal(), format='csr')
 setup_jacobi = time.perf_counter() - t0
 run("Jacobi", M=M_jacobi, setup_time=setup_jacobi)
 
-# 3) SSOR
+ 
 t0 = time.perf_counter()
 omega = 1.0
 D = sp.diags(A.diagonal(), format='csc')
@@ -176,10 +167,7 @@ M_ic = LinearOperator(A.shape, matvec=apply_ic, dtype=float)
 setup_ic = time.perf_counter() - t0
 run("IC(0)", M=M_ic, setup_time=setup_ic)
 
-
-# ==============================================================
-# Summary table
-# ==============================================================
+ 
 print("\n" + "=" * 90)
 print(f"{'Method':<25}{'Iters':>7}{'Relres':>14}"
       f"{'Setup(s)':>12}{'Solve(s)':>12}{'Total(s)':>12}")
@@ -190,18 +178,14 @@ for name, info, iters, res, ts, tv, tt in results:
           f"{ts:>12.4f}{tv:>12.4f}{tt:>12.4f}{tag}")
 print("=" * 90)
 
-
-# ==============================================================
-# Plot
-# ==============================================================
+ 
 plt.figure(figsize=(9, 6))
 
-# رسم CG بخط متقطع عريض ليظهر فوق Jacobi
+ 
 plt.semilogy(range(1, len(histories["no preconditioning"]) + 1), 
              histories["no preconditioning"], 
              label='CG', linestyle='--', linewidth=2.5, color='blue')
 
-# رسم Jacobi بخط رفيع
 plt.semilogy(range(1, len(histories["Jacobi"]) + 1), 
              histories["Jacobi"], 
              label='CG + Jacobi', linewidth=1.5, color='orange')
