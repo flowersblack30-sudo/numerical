@@ -6,10 +6,6 @@ from scipy.sparse import lil_matrix
 from scipy.sparse.linalg import gmres, bicgstab
 
 
-# ==================================================
-# 1. Problem parameters
-# ==================================================
-
 N = 40
 epsi = 0.01
 beta1 = 1
@@ -17,11 +13,7 @@ beta2 = 1
 
 h = 1 / (N + 1)
 n = N * N
-
-
-# ==================================================
-# 2. Construct the linear system A*x = b
-# ==================================================
+ 
 
 A = lil_matrix((n, n))
 b = np.zeros(n)
@@ -35,51 +27,36 @@ for j in range(1, N + 1):
         x = i * h
         y = j * h
 
-        # Exact solution
-        u_exact[k] = np.sin(np.pi * x) * np.sin(np.pi * y)
+         u_exact[k] = np.sin(np.pi * x) * np.sin(np.pi * y)
 
-        # Right-hand side
-        b[k] = (
+         b[k] = (
             2 * epsi * np.pi**2 * np.sin(np.pi*x) * np.sin(np.pi*y)
             + np.pi * beta1 * np.cos(np.pi*x) * np.sin(np.pi*y)
             + np.pi * beta2 * np.sin(np.pi*x) * np.cos(np.pi*y)
         )
 
-        # Main diagonal
-        A[k, k] = 4 * epsi / h**2
+         A[k, k] = 4 * epsi / h**2
 
-        # East
-        if i < N:
+         if i < N:
             A[k, k + 1] = -epsi / h**2 + beta1 / (2 * h)
 
-        # West
-        if i > 1:
+         if i > 1:
             A[k, k - 1] = -epsi / h**2 - beta1 / (2 * h)
 
-        # North
-        if j < N:
+         if j < N:
             A[k, k + N] = -epsi / h**2 + beta2 / (2 * h)
 
-        # South
-        if j > 1:
+         if j > 1:
             A[k, k - N] = -epsi / h**2 - beta2 / (2 * h)
 
-# Convert to CSR format for efficient iterative solving
-A = A.tocsr()
-
-
-# ==================================================
-# 3. Initial conditions
-# ==================================================
+ 
+A = A.tocsr() 
 
 x0 = np.zeros(n)
 tol = 1e-8
 maxit = 500
 
-
-# ==================================================
-# 4. Influence of restart parameter m
-# ==================================================
+ 
 
 M = [10, 20, 40, 80]
 
@@ -114,15 +91,9 @@ for m in M:
     print(f"Iterations = {total_iter}")
     print(f"Runtime = {runtime:.6f} s")
     print(f"Residual = {residual:.4e}")
-    print(f"Solver info = {info}\n")
+    print(f"Solver info = {info}\n") 
 
-
-# ==================================================
-# 5. Comparison GMRES and BiCGSTAB
-# ==================================================
-
-# GMRES(20)
-
+ 
 resg = []
 
 def gmres_comparison_callback(residual):
@@ -145,9 +116,6 @@ time_gmres = time.perf_counter() - start
 iter_gmres = len(resg)
 
 residual_gmres = np.linalg.norm(b - A @ xg) / np.linalg.norm(b)
-
-
-# BiCGSTAB
 
 resb = []
 
@@ -183,12 +151,6 @@ print(f"\nBiCGSTAB iterations = {iter_bicg}")
 print(f"BiCGSTAB time = {time_bicg:.6f} s")
 print(f"BiCGSTAB residual = {residual_bicg:.4e}")
 print(f"BiCGSTAB info = {flagb}")
-# ==================================================
-# 6. Plot exact and numerical solutions
-# ==================================================
-
-# MATLAB uses column-major ordering.
-# Therefore, we use order='F' in NumPy.
 
 U = xg.reshape((N, N), order='F')
 Uexact = u_exact.reshape((N, N), order='F')
@@ -216,11 +178,6 @@ ax.set_title('Exact Solution')
 ax.set_xlabel('x')
 ax.set_ylabel('y')
 ax.set_zlabel('u(x,y)')
-
-
-# ==================================================
-# 7. Plot residual comparison
-# ==================================================
 
 plt.figure()
 
